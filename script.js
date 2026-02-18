@@ -1,17 +1,20 @@
 fetch("schedule.json")
   .then(response => response.json())
   .then(data => {
-    const today = new Date().getDay();
-    const todaySchedule = data[today];
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const todayString = `${yyyy}-${mm}-${dd}`;
 
     const scheduleDiv = document.getElementById("schedule");
 
-    if (!todaySchedule) {
-      scheduleDiv.textContent = "時間割がありません";
+    if (!data[todayString]) {
+      scheduleDiv.textContent = "今日は時間割が登録されていません";
       return;
     }
 
-    scheduleDiv.innerHTML = todaySchedule
+    scheduleDiv.innerHTML = data[todayString]
       .map(subject => `<p>${subject}</p>`)
       .join("");
   })
