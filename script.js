@@ -1,49 +1,24 @@
-let weekOffset = 0;
+fetch("schedule.json")
+  .then(response => response.json())
+  .then(data => {
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    const todayString = `${yyyy}-${mm}-${dd}`;
 
-function loadSchedule() {
-  fetch("schedule.json")
-    .then(response => response.json())
-    .then(data => {
+    const scheduleDiv = document.getElementById("schedule");
 
-      const scheduleDiv = document.getElementById("schedule");
-      scheduleDiv.innerHTML = "";
+    if (!data[todayString]) {
+      scheduleDiv.textContent = "今日は時間割が登録されていません";
+      return;
+    }
 
-      const today = new Date();
-      const day = today.getDay();
-
-      const monday = new Date(today);
-      const diff = day === 0 ? -6 : 1 - day;
-      monday.setDate(today.getDate() + diff + weekOffset * 7);
-
-      for (let i = 0; i < 7; i++) {
-
-        const current = new Date(monday);
-        current.setDate(monday.getDate() + i);
-
-        const yyyy = current.getFullYear();
-        const mm = String(current.getMonth() + 1).padStart(2, "0");
-        const dd = String(current.getDate()).padStart(2, "0");
-        const dateString = `${yyyy}-${mm}-${dd}`;
-
-        const dayBox = document.createElement("div");
-        dayBox.innerHTML = `<h3>${dateString}</h3>`;
-
-        if (data[dateString]) {
-          dayBox.innerHTML += data[dateString]
-            .map(subject => `<p>${subject}</p>`)
-            .join("");
-        } else {
-          dayBox.innerHTML += "<p>登録なし</p>";
-        }
-
-        scheduleDiv.appendChild(dayBox);
-      }
-    });
-}
-
-function changeWeek(offset) {
-  weekOffset += offset;
-  loadSchedule();
-}
-
-loadSchedule();
+    scheduleDiv.innerHTML = data[todayString]
+      .map(subject => `<p>${subject}</p>`)
+      .join("");
+  })
+  .catch(error => {
+    document.getElementById("schedule").textContent = "読み込み失敗";
+    console.error(error);
+  });
