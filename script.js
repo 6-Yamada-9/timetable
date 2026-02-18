@@ -1,3 +1,5 @@
+console.log("NEW VERSION");
+
 fetch("schedule.json")
   .then(response => response.json())
   .then(data => {
